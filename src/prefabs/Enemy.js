@@ -1,10 +1,10 @@
-class Player extends Phaser.GameObjects.Sprite {
+class Enemy extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture, frame) {
         super(scene, x, y, texture, frame);
 
         scene.add.existing(this);
 
-        this.depth = 2;
+        this.depth = 1;
 
         this.stats = {
             health: 100,
@@ -40,7 +40,7 @@ class Player extends Phaser.GameObjects.Sprite {
             this.jumpCounter += 1;
         }
         */
-
+        /*
         if (keybinds.keyS.isDown && !this.touchingGround && this.stats.health > 0) {
             // console.log("falling faster");
             this.fallVelocity += 1 / 4;
@@ -50,6 +50,7 @@ class Player extends Phaser.GameObjects.Sprite {
             // console.log("falling slower");
             this.fallVelocity -= 1 / 4;
         }
+        */
 
         if (this.fallVelocity <= -5) {
             this.fallVelocity = -5;

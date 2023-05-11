@@ -8,16 +8,19 @@ Notes:
 
 let gameConfiguration = {
     type: Phaser.AUTO,
-    width: 1280,
-    height: 720,
-    scene: [Menu, Game]
+    gameSpeed: 1,
+    gravity: 10,
+    width: 800,
+    height: 600,
+    scene: [Game]
 }
 
 let globalVariables = {
     highScore: 0,       // tracks the highest score achieved by the player.
     currentScore: 0,    // tracks the current score of the player.
-    gameState: "Menu",  // tracks the current state of the game.
-    framerate: 60       // the framerate the game will run at.
+    // gameState: "Menu",  // tracks the current state of the game.
+    // framerate: 60       // the framerate the game will run at.
+    gameDelta: 0
 }
 
 let keybinds = {
