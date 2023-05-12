@@ -6,6 +6,7 @@ class Player extends Phaser.GameObjects.Sprite {
 
         this.parentScene = scene;
 
+        // stats for the player
         this.stats = {
             health: 1,
             speed: 160,
@@ -15,12 +16,13 @@ class Player extends Phaser.GameObjects.Sprite {
             status: 'alive'
         }
 
+        // variables to keep track of the player's states
         this.fallVelocity = 0;
         this.touchingGround = false;
         this.animationTime = 0;
-
         this.lastAngleChange = 0;
 
+        // player sounds
         this.balloonStep = this.parentScene.sound.add('balloonStep');
         this.balloonFly = this.parentScene.sound.add('balloonFly');
         this.balloonFly.setLoop(true);
@@ -28,6 +30,7 @@ class Player extends Phaser.GameObjects.Sprite {
         // this.balloonInjured = this.parentScene.sound.add('balloonInjured');
         // this.balloonDead = this.parentScene.sound.add('balloonDead');
 
+        // debounces for the sounds
         this.balloonStepDebounce = false;
         this.balloonImpactDebounce = false;
         // this.balloonInjuredDebounce = false;
@@ -45,12 +48,14 @@ class Player extends Phaser.GameObjects.Sprite {
     update() {
         this.animationTime += 1 * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
 
+        // "slow-mo" effect when the player is dead
         if (this.stats.health > 0) {
             this.fallVelocity += gameConfiguration.gravity / globalVariables.gameDelta;
         } else {
             this.fallVelocity += gameConfiguration.gravity * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
         }
 
+        // change state depending on the player's health
         if (this.stats.health <= 0) {
             this.stats.status = 'dead';
             this.setOrigin(0.5, 0.5);
@@ -59,6 +64,7 @@ class Player extends Phaser.GameObjects.Sprite {
             this.setOrigin(0, 0);
         }
 
+        // move the player up smoothly
         if (this.stats.status == 'alive') {
             if (keybinds.keyW.isDown) {
                 this.fallVelocity -= this.stats.jumpStrength / globalVariables.gameDelta;
@@ -76,16 +82,19 @@ class Player extends Phaser.GameObjects.Sprite {
             }
         }
 
+        // mainly for the "slow-mo" effect when the player dies
         if (this.stats.health > 0) {
             this.y += this.fallVelocity / globalVariables.gameDelta;
         } else {
             this.y += this.fallVelocity * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
         }
 
+        // stop the velocity when the player hits the ceiling
         if (this.y <= 0) {
             this.fallVelocity = 0;
             this.y = 0;
 
+            // impact sound when the player's head hits the ceiling
             if (!this.balloonImpactDebounce && this.stats.health <= 0) {
                 this.balloonImpactDebounce = true;
                 this.balloonImpact.play();
@@ -94,6 +103,7 @@ class Player extends Phaser.GameObjects.Sprite {
             }
         }
 
+        // checks for when the player is or is not airborne
         if (this.y >= gameConfiguration.height - this.height - 40) {
             this.touchingGround = true;
             this.fallVelocity = 0;
@@ -101,7 +111,8 @@ class Player extends Phaser.GameObjects.Sprite {
         } else {
             this.touchingGround = false;
         }
-        
+
+        // animation handling. i was supposed to use a "texture atlas" but I didn't feel that I would have enough "control" compared to this method.
         if (this.stats.status == 'alive') {
             if (this.touchingGround) {
                 this.angle = 0;
