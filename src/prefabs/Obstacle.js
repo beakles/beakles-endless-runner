@@ -4,15 +4,7 @@ class Obstacle extends Phaser.GameObjects.Sprite {
 
         scene.add.existing(this);
 
-        this.properties = {
-            rotation: 'horizontal'
-        }
-
-        // scene.physics.add.existing(this);
-        // this.setImmovable(true);
-        // this.setPushable(false);
-
-        // this.depth = 1;
+        this.type = 'hurt';
     }
 
     preload() {

@@ -4,6 +4,9 @@ Endless Joyride
 Notes:
     - endless runner but you also have to shoot bad guys i guess
     - use the gun to both shoot obstacles and launch yourself
+
+Menu music by Dream-Protocol from Pixabay: "https://pixabay.com/music/video-games-feed-the-machine-classic-arcade-game-116846/"
+Gameplay music by Dream-Protocol from Pixabay: "https://pixabay.com/music/video-games-play-again-classic-arcade-game-116820/"
 */
 
 let gameConfiguration = {
@@ -13,7 +16,7 @@ let gameConfiguration = {
     scrollSpeed: 1,
     width: 1280,
     height: 720,
-    scene: [Game],
+    scene: [Menu, Game],
     /*
     physics: {
         default: 'arcade',
@@ -34,10 +37,8 @@ let globalVariables = {
 
 let keybinds = {
     keyW: null,
-    keyA: null,
-    keyS: null,
     keyR: null,
-    keySpace: null
+    keyM: null
 }
 
 let phaserGame = new Phaser.Game(gameConfiguration);

@@ -22,10 +22,14 @@ class Player extends Phaser.GameObjects.Sprite {
         this.lastAngleChange = 0;
 
         this.balloonStep = this.parentScene.sound.add('balloonStep');
+        this.balloonFly = this.parentScene.sound.add('balloonFly');
+        this.balloonFly.setLoop(true);
+        this.balloonImpact = this.parentScene.sound.add('balloonImpact');
         // this.balloonInjured = this.parentScene.sound.add('balloonInjured');
         // this.balloonDead = this.parentScene.sound.add('balloonDead');
 
         this.balloonStepDebounce = false;
+        this.balloonImpactDebounce = false;
         // this.balloonInjuredDebounce = false;
         // this.balloonDeadDebounce = false;
     }
@@ -41,7 +45,11 @@ class Player extends Phaser.GameObjects.Sprite {
     update() {
         this.animationTime += 1 * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
 
-        this.fallVelocity += gameConfiguration.gravity / globalVariables.gameDelta;
+        if (this.stats.health > 0) {
+            this.fallVelocity += gameConfiguration.gravity / globalVariables.gameDelta;
+        } else {
+            this.fallVelocity += gameConfiguration.gravity * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
+        }
 
         if (this.stats.health <= 0) {
             this.stats.status = 'dead';
@@ -57,14 +65,33 @@ class Player extends Phaser.GameObjects.Sprite {
                 if (this.fallVelocity < -1000) {
                     this.fallVelocity = -1000;
                 }
+
+                if (!this.balloonFly.isPlaying) {
+                    this.balloonFly.play();
+                }
+            } else {
+                if (this.balloonFly.isPlaying) {
+                    this.balloonFly.stop();
+                }
             }
         }
 
-        this.y += this.fallVelocity / globalVariables.gameDelta;
+        if (this.stats.health > 0) {
+            this.y += this.fallVelocity / globalVariables.gameDelta;
+        } else {
+            this.y += this.fallVelocity * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
+        }
 
         if (this.y <= 0) {
             this.fallVelocity = 0;
             this.y = 0;
+
+            if (!this.balloonImpactDebounce && this.stats.health <= 0) {
+                this.balloonImpactDebounce = true;
+                this.balloonImpact.play();
+            } else {
+                this.balloonImpactDebounce = false;
+            }
         }
 
         if (this.y >= gameConfiguration.height - this.height - 40) {
@@ -111,10 +138,18 @@ class Player extends Phaser.GameObjects.Sprite {
             }
         } else if (this.stats.status == 'dead') {
             this.setTexture('playerCharacterDead');
+            if (this.balloonFly.isPlaying) {
+                this.balloonFly.stop();
+            }
             if (this.touchingGround) {
+                if (!this.balloonImpactDebounce) {
+                    this.balloonImpactDebounce = true;
+                    this.balloonImpact.play();
+                }
                 this.angle += 200 * (gameConfiguration.gameSpeed * gameConfiguration.scrollSpeed / globalVariables.gameDelta);
             } else {
                 this.angle += this.lastAngleChange * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
+                this.balloonImpactDebounce = false;
             }
         }
     }
