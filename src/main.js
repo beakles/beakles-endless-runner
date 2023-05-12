@@ -13,7 +13,15 @@ let gameConfiguration = {
     scrollSpeed: 1,
     width: 1280,
     height: 720,
-    scene: [Game]
+    scene: [Game],
+    /*
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: false
+        }
+    }
+    */
 }
 
 let globalVariables = {
@@ -28,7 +36,8 @@ let keybinds = {
     keyW: null,
     keyA: null,
     keyS: null,
-    keyR: null
+    keyR: null,
+    keySpace: null
 }
 
 let phaserGame = new Phaser.Game(gameConfiguration);

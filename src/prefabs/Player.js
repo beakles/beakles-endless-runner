@@ -4,7 +4,7 @@ class Player extends Phaser.GameObjects.Sprite {
 
         scene.add.existing(this);
 
-        this.depth = 2;
+        this.parentScene = scene;
 
         this.stats = {
             health: 1,
@@ -15,12 +15,19 @@ class Player extends Phaser.GameObjects.Sprite {
             status: 'alive'
         }
 
-        // this.attackDebounce = false;
         this.fallVelocity = 0;
         this.touchingGround = false;
         this.animationTime = 0;
-        // this.jumpCounter = 0;
-        // this.flyDebounce = 0;
+
+        this.lastAngleChange = 0;
+
+        this.balloonStep = this.parentScene.sound.add('balloonStep');
+        // this.balloonInjured = this.parentScene.sound.add('balloonInjured');
+        // this.balloonDead = this.parentScene.sound.add('balloonDead');
+
+        this.balloonStepDebounce = false;
+        // this.balloonInjuredDebounce = false;
+        // this.balloonDeadDebounce = false;
     }
 
     preload() {
@@ -34,12 +41,14 @@ class Player extends Phaser.GameObjects.Sprite {
     update() {
         this.animationTime += 1 * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
 
-        this.fallVelocity += gameConfiguration.gravity * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
+        this.fallVelocity += gameConfiguration.gravity / globalVariables.gameDelta;
 
         if (this.stats.health <= 0) {
             this.stats.status = 'dead';
+            this.setOrigin(0.5, 0.5);
         } else {
             this.stats.status = 'alive';
+            this.setOrigin(0, 0);
         }
 
         if (this.stats.status == 'alive') {
@@ -51,89 +60,62 @@ class Player extends Phaser.GameObjects.Sprite {
             }
         }
 
-        this.y += this.fallVelocity * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
+        this.y += this.fallVelocity / globalVariables.gameDelta;
 
-        if (this.y <= 0 + this.height / 2 + 40) {
+        if (this.y <= 0) {
             this.fallVelocity = 0;
-            this.y = 0 + this.height / 2 + 40;
+            this.y = 0;
         }
 
-        if (this.y >= gameConfiguration.height - this.height / 2 - 40) {
+        if (this.y >= gameConfiguration.height - this.height - 40) {
             this.touchingGround = true;
             this.fallVelocity = 0;
-            this.y = gameConfiguration.height - this.height / 2 - 40;
+            this.y = gameConfiguration.height - this.height - 40;
         } else {
             this.touchingGround = false;
         }
         
         if (this.stats.status == 'alive') {
             if (this.touchingGround) {
+                this.angle = 0;
                 if (this.animationTime > 0.6) {
                     this.animationTime = 0;
                     this.setTexture('playerCharacterMidRun');
+                    this.balloonStepDebounce = false;
                 } else if (this.animationTime > 0.45) {
                     this.setTexture('playerCharacterRunLeft');
+                    if (!this.balloonStepDebounce) {
+                        this.balloonStepDebounce = true;
+                        this.balloonStep.play();
+                    }
                 } else if (this.animationTime > 0.3) {
                     this.setTexture('playerCharacterMidRun');
+                    this.balloonStepDebounce = false;
                 } else if (this.animationTime > 0.15) {
                     this.setTexture('playerCharacterRunRight');
+                    if (!this.balloonStepDebounce) {
+                        this.balloonStepDebounce = true;
+                        this.balloonStep.play();
+                    }
                 }
             } else {
+                this.angle = this.fallVelocity / 100;
                 if (this.fallVelocity < 0) {
                     this.setTexture('playerCharacterRise');
                 } else if (this.fallVelocity > 0) {
                     this.setTexture('playerCharacterFall');
                 } else {
                     this.setTexture('playerCharacterMidRun');
+                    this.angle = Phaser.Math.Between(-2, 2);
                 }
             }
         } else if (this.stats.status == 'dead') {
             this.setTexture('playerCharacterDead');
-            this.angle += 100 * (gameConfiguration.gameSpeed * gameConfiguration.scrollSpeed / globalVariables.gameDelta);
+            if (this.touchingGround) {
+                this.angle += 200 * (gameConfiguration.gameSpeed * gameConfiguration.scrollSpeed / globalVariables.gameDelta);
+            } else {
+                this.angle += this.lastAngleChange * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
+            }
         }
-
-        // console.log(`player position: ${this.y}`);
-        // console.log(`fall velocity: ${this.fallVelocity}`);
-
-        /*
-        if (Phaser.Input.Keyboard.JustDown(keybinds.keyW) && this.jumpCounter < this.stats.jumpCount) {
-            this.fallVelocity = 0 - this.stats.jumpStrength;
-            this.jumpCounter += 1;
-        }
-        */
-
-        /*
-        if (keybinds.keyS.isDown && !this.touchingGround && this.stats.health > 0) {
-            // console.log("falling faster");
-            this.fallVelocity += 1 * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
-        }
-
-        if (keybinds.keyW.isDown && this.stats.health > 0) {
-            // console.log("falling slower");
-            this.fallVelocity -= 10000 * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
-        }
-
-        if (this.fallVelocity <= -500) {
-            this.fallVelocity = -500;
-        }
-
-        this.fallVelocity += gameConfiguration.gravity * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
-        this.y += this.fallVelocity * (gameConfiguration.gameSpeed / globalVariables.gameDelta);
-
-        if (this.y >= gameConfiguration.height - 30) {
-            this.fallVelocity = 0;
-            this.y = gameConfiguration.height - 30;
-
-            // this.jumpCounter = 0;
-            this.touchingGround = true;
-        } else if (this.y <= 0 + 30) {
-            this.fallVelocity = 0;
-            this.y = 0 + 30;
-
-            this.touchingGround = true;
-        } else {
-            this.touchingGround = false;
-        }
-        */
     }
 }
