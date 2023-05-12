@@ -136,18 +136,18 @@ class Game extends Phaser.Scene {
         this.finalScoreText.depth = 5;
         this.finalScoreText.alpha = 0;
 
-        this.newBestText = this.add.text(gameConfiguration.width / 2, gameConfiguration.height / 1.75 + 75, 'New best!', newBestTextProperties).setOrigin(0.5, 0.5);
+        this.newBestText = this.add.text(gameConfiguration.width / 2, gameConfiguration.height / 1.75 + 75, 'NEW BEST!', newBestTextProperties).setOrigin(0.5, 0.5);
         this.newBestText.depth = 5;
         this.newBestText.alpha = 0;
 
-        this.nextOptionText = this.add.text(gameConfiguration.width / 2, gameConfiguration.height / 1.25, 'Press (R) to try again or press (M) to return to the menu', nextOptionTextProperties).setOrigin(0.5, 0.5);
+        this.nextOptionText = this.add.text(gameConfiguration.width / 2, gameConfiguration.height / 1.25, 'PRESS (R) TO TRY AGAIN OR PRESS (SPACE) TO RETURN TO THE MENU', nextOptionTextProperties).setOrigin(0.5, 0.5);
         this.nextOptionText.depth = 5;
         this.nextOptionText.alpha = 0;
 
         // assign keybinds
         keybinds.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         keybinds.keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-        keybinds.keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+        keybinds.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         // create player
         this.playerSprite = new Player(this, gameConfiguration.width / 4, gameConfiguration.height / 2, 'playerCharacterMidRun', 0).setOrigin(0, 0);
@@ -190,10 +190,19 @@ class Game extends Phaser.Scene {
         globalVariables.gameDelta = 1000 / delta;
 
         if (Phaser.Input.Keyboard.JustDown(keybinds.keyR)) {
+            this.sound.play('menuInteract');
             gameConfiguration.gameSpeed = 1;
             gameConfiguration.scrollSpeed = 1;
             this.gameMusic.stop();
             this.scene.restart();
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(keybinds.keySpace)) {
+            this.sound.play('menuInteract');
+            gameConfiguration.gameSpeed = 1;
+            gameConfiguration.scrollSpeed = 1;
+            this.gameMusic.stop();
+            this.scene.start('sceneMenu');
         }
 
         // timer for when to spawn another obstacle
@@ -212,7 +221,7 @@ class Game extends Phaser.Scene {
         }
 
         // update final score
-        this.finalScoreText.text = Math.floor(globalVariables.currentScore) + " Meters";
+        this.finalScoreText.text = Math.floor(globalVariables.currentScore) + " METERS";
 
         // move the background
         this.background.tilePositionX += 300 * (gameConfiguration.gameSpeed * gameConfiguration.scrollSpeed / globalVariables.gameDelta);
