@@ -9,9 +9,10 @@ Notes:
 let gameConfiguration = {
     type: Phaser.AUTO,
     gameSpeed: 1,
-    gravity: 10,
-    width: 800,
-    height: 600,
+    gravity: 1000,
+    scrollSpeed: 1,
+    width: 1280,
+    height: 720,
     scene: [Game]
 }
 
@@ -27,7 +28,7 @@ let keybinds = {
     keyW: null,
     keyA: null,
     keyS: null,
-    keyD: null
+    keyR: null
 }
 
 let phaserGame = new Phaser.Game(gameConfiguration);
